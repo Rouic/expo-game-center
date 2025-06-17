@@ -20,15 +20,17 @@ try {
   const { requireNativeModule } = require('expo-modules-core');
   GameCenterNativeModule = requireNativeModule('ExpoGameCenter');
   console.log('[ExpoGameCenter] Native module loaded successfully via expo-modules-core');
-} catch (error: any) {
-  console.log('[ExpoGameCenter] Failed to load native module:', error?.message || 'Unknown error');
+} catch (error: unknown) {
+  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+  console.log('[ExpoGameCenter] Failed to load native module:', errorMessage);
   // Try alternative method
   try {
     const { requireNativeModule } = require('expo');
     GameCenterNativeModule = requireNativeModule('ExpoGameCenter');
     console.log('[ExpoGameCenter] Native module loaded successfully via expo');
-  } catch (fallbackError: any) {
-    console.log('[ExpoGameCenter] All native module loading attempts failed:', fallbackError?.message || 'Unknown error');
+  } catch (fallbackError: unknown) {
+    const fallbackErrorMessage = fallbackError instanceof Error ? fallbackError.message : 'Unknown error';
+    console.log('[ExpoGameCenter] All native module loading attempts failed:', fallbackErrorMessage);
     GameCenterNativeModule = null;
   }
 }

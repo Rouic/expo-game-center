@@ -64,14 +64,14 @@ If you prefer manual configuration or need custom settings, add the Game Center 
 ### Basic Setup
 
 ```typescript
-import * as GameCenter from 'expo-game-center';
+import ExpoGameCenter from 'expo-game-center';
 
 // Check if Game Center is available
-const isAvailable = await GameCenter.isGameCenterAvailable();
+const isAvailable = await ExpoGameCenter.isGameCenterAvailable();
 
 if (isAvailable) {
   // Authenticate the player
-  const authenticated = await GameCenter.authenticateLocalPlayer();
+  const authenticated = await ExpoGameCenter.authenticateLocalPlayer();
   
   if (authenticated) {
     console.log('Player authenticated successfully!');
@@ -82,19 +82,19 @@ if (isAvailable) {
 ### Player Authentication
 
 ```typescript
-import * as GameCenter from 'expo-game-center';
+import ExpoGameCenter from 'expo-game-center';
 
 async function authenticatePlayer() {
   try {
-    const authenticated = await GameCenter.authenticateLocalPlayer();
+    const authenticated = await ExpoGameCenter.authenticateLocalPlayer();
     
     if (authenticated) {
       // Get player information
-      const player = await GameCenter.getLocalPlayer();
+      const player = await ExpoGameCenter.getLocalPlayer();
       console.log('Player:', player);
       
       // Get player's profile image
-      const playerImage = await GameCenter.getPlayerImage();
+      const playerImage = await ExpoGameCenter.getPlayerImage();
       if (playerImage) {
         // playerImage is a base64-encoded data URI
         console.log('Player image:', playerImage);
@@ -112,7 +112,7 @@ async function authenticatePlayer() {
 // Submit a score
 async function submitScore(score: number) {
   try {
-    const success = await GameCenter.submitScore(score, 'your_leaderboard_id');
+    const success = await ExpoGameCenter.submitScore(score, 'your_leaderboard_id');
     if (success) {
       console.log('Score submitted successfully!');
     }
@@ -124,7 +124,7 @@ async function submitScore(score: number) {
 // Present leaderboard UI
 async function showLeaderboard() {
   try {
-    await GameCenter.presentLeaderboard('your_leaderboard_id');
+    await ExpoGameCenter.presentLeaderboard('your_leaderboard_id');
   } catch (error) {
     console.error('Failed to show leaderboard:', error);
   }
@@ -137,7 +137,7 @@ async function showLeaderboard() {
 // Report achievement progress
 async function reportAchievement(achievementId: string, progress: number) {
   try {
-    const success = await GameCenter.reportAchievement(achievementId, progress);
+    const success = await ExpoGameCenter.reportAchievement(achievementId, progress);
     if (success) {
       console.log('Achievement progress reported!');
     }
@@ -149,7 +149,7 @@ async function reportAchievement(achievementId: string, progress: number) {
 // Show achievements UI
 async function showAchievements() {
   try {
-    await GameCenter.presentAchievements();
+    await ExpoGameCenter.presentAchievements();
   } catch (error) {
     console.error('Failed to show achievements:', error);
   }
@@ -162,7 +162,7 @@ async function showAchievements() {
 // Present the main Game Center interface
 async function showGameCenter() {
   try {
-    await GameCenter.presentGameCenterViewController();
+    await ExpoGameCenter.presentGameCenterViewController();
   } catch (error) {
     console.error('Failed to show Game Center:', error);
   }

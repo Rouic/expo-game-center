@@ -1,7 +1,7 @@
 {
-  "extends": "expo-module-scripts/tsconfig.base",
   "compilerOptions": {
     "outDir": "./build",
+    "rootDir": "./src",
     "declaration": true,
     "declarationMap": true,
     "strict": true,
@@ -12,15 +12,19 @@
     "moduleResolution": "node",
     "target": "ES2019",
     "lib": ["ES2019"],
-    "module": "CommonJS"
+    "module": "CommonJS",
+    "sourceMap": true
   },
   "include": [
-    "src"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",
     "build",
     "ios",
-    "android"
+    "android",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/__tests__/**/*"
   ]
 }
