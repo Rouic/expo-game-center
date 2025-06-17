@@ -57,10 +57,12 @@
   "dependencies": {
     "@expo/config-plugins": "^7.0.0"
   },
+  "optionalDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-native": "^0.70.0"
+  },
   "devDependencies": {
     "@types/jest": "^29.5.0",
-    "@types/react": "^18.0.0",
-    "@types/react-native": "^0.73.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.0.0",

@@ -19,14 +19,7 @@ export interface GameCenterModule {
   presentGameCenterViewController(): Promise<void>;
 }
 
-// Export service layer and connection manager
-export { 
-  GameCenterService,
-  type GameCenterConfig,
-  type ScoreSubmissionResult,
-  type AchievementResult 
-} from './GameCenterService';
-
+// Export connection manager (no React dependencies)
 export { 
   GameCenterConnectionManager,
   type ConnectionState,
@@ -34,7 +27,14 @@ export {
   type StateChangeListener 
 } from './GameCenterConnectionManager';
 
-// Export React hooks
+// Export service layer and hooks (users must have React/React Native as peer deps)
+export { 
+  GameCenterService,
+  type GameCenterConfig,
+  type ScoreSubmissionResult,
+  type AchievementResult 
+} from './GameCenterService';
+
 export { 
   useGameCenter,
   type UseGameCenterOptions,

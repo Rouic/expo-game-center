@@ -28,7 +28,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Run tests
         run: npm run test:ci
@@ -65,14 +65,14 @@ jobs:
           cache: 'npm'
 
       - name: Install main package dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Build main package
         run: npm run build
 
       - name: Install example dependencies
         working-directory: ./example
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Check example TypeScript
         working-directory: ./example
