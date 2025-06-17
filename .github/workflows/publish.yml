@@ -1,0 +1,175 @@
+name: Publish Package
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - '.github/**'
+  push:
+    tags:
+      - 'v*' # Trigger on version tags
+  workflow_dispatch: # Allow manual trigger
+    inputs:
+      publish_npm:
+        description: 'Publish to NPM'
+        required: true
+        default: true
+        type: boolean
+      publish_github:
+        description: 'Publish to GitHub Packages'
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js for NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test:ci
+
+      - name: Run type check
+        run: npm run typecheck
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Build package
+        run: npm run build
+
+      - name: Check if version changed
+        id: version-check
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          PUBLISHED_VERSION=$(npm view expo-game-center version 2>/dev/null || echo "0.0.0")
+          echo "current-version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "published-version=$PUBLISHED_VERSION" >> $GITHUB_OUTPUT
+          if [ "$CURRENT_VERSION" != "$PUBLISHED_VERSION" ]; then
+            echo "version-changed=true" >> $GITHUB_OUTPUT
+            echo "Version changed from $PUBLISHED_VERSION to $CURRENT_VERSION"
+          else
+            echo "version-changed=false" >> $GITHUB_OUTPUT
+            echo "Version unchanged: $CURRENT_VERSION"
+          fi
+
+      - name: Publish to NPM
+        if: steps.version-check.outputs.version-changed == 'true' && (github.event_name != 'workflow_dispatch' || inputs.publish_npm == true)
+        run: npm publish --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Setup Node.js for GitHub Packages
+        if: steps.version-check.outputs.version-changed == 'true' && (github.event_name != 'workflow_dispatch' || inputs.publish_github == true)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://npm.pkg.github.com'
+
+      - name: Configure package for GitHub Packages
+        if: steps.version-check.outputs.version-changed == 'true' && (github.event_name != 'workflow_dispatch' || inputs.publish_github == true)
+        run: |
+          # Backup original package.json
+          cp package.json package.json.bak
+          # Update package name for GitHub Packages
+          npm pkg set name="@rouic/expo-game-center"
+          npm pkg set publishConfig.registry="https://npm.pkg.github.com/"
+
+      - name: Publish to GitHub Packages
+        if: steps.version-check.outputs.version-changed == 'true' && (github.event_name != 'workflow_dispatch' || inputs.publish_github == true)
+        run: npm publish --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Restore original package.json
+        if: steps.version-check.outputs.version-changed == 'true' && (github.event_name != 'workflow_dispatch' || inputs.publish_github == true)
+        run: mv package.json.bak package.json
+
+      - name: Generate Release Notes
+        if: steps.version-check.outputs.version-changed == 'true'
+        id: generate-notes
+        run: |
+          echo "generating release notes..."
+          NOTES=$(cat << 'EOF'
+          ## 🚀 What's New in v${{ steps.version-check.outputs.current-version }}
+          
+          Auto-generated release from the main branch.
+          
+          ### 📦 Installation
+          
+          **NPM:**
+          ```bash
+          npm install expo-game-center@${{ steps.version-check.outputs.current-version }}
+          ```
+          
+          **Yarn:**
+          ```bash
+          yarn add expo-game-center@${{ steps.version-check.outputs.current-version }}
+          ```
+          
+          **GitHub Packages:**
+          ```bash
+          npm install @rouic/expo-game-center@${{ steps.version-check.outputs.current-version }}
+          ```
+          
+          ### 🔧 Usage
+          
+          ```typescript
+          import ExpoGameCenter from 'expo-game-center';
+          
+          const isAvailable = await ExpoGameCenter.isGameCenterAvailable();
+          ```
+          
+          ### 📚 Documentation
+          
+          - [📖 README](https://github.com/Rouic/expo-game-center#readme)
+          - [🎯 Example App](https://github.com/Rouic/expo-game-center/tree/main/example)
+          - [🛠️ Implementation Guide](https://github.com/Rouic/expo-game-center/blob/main/example/IMPLEMENTATION_GUIDE.md)
+          
+          ### 🔗 Links
+          
+          - [📦 NPM Package](https://www.npmjs.com/package/expo-game-center)
+          - [📂 GitHub Repository](https://github.com/Rouic/expo-game-center)
+          EOF
+          )
+          # Save multiline string to output
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        if: steps.version-check.outputs.version-changed == 'true'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version-check.outputs.current-version }}
+          release_name: 🎮 expo-game-center v${{ steps.version-check.outputs.current-version }}
+          body: ${{ steps.generate-notes.outputs.notes }}
+          draft: false
+          prerelease: ${{ contains(steps.version-check.outputs.current-version, '-') }}
+
+      - name: No version change
+        if: steps.version-check.outputs.version-changed == 'false'
+        run: echo "No version change detected. Skipping npm publish."

@@ -1,12 +1,4 @@
-// Mock expo-modules-core
-jest.mock('expo-modules-core', () => ({
-  requireNativeModule: jest.fn(),
-}));
-
-// Mock expo as fallback
-jest.mock('expo', () => ({
-  requireNativeModule: jest.fn(),
-}));
+// Mocks are now in setup.ts
 
 describe('ExpoGameCenterModule', () => {
   beforeEach(() => {

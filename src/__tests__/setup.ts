@@ -8,15 +8,6 @@ global.console = {
   // error: jest.fn(),
 };
 
-// Mock common React Native/Expo modules
-jest.mock('react-native', () => ({
-  NativeModules: {},
-  Platform: {
-    OS: 'ios',
-    select: jest.fn((obj) => obj.ios),
-  },
-}));
-
 // Set up test environment
 beforeEach(() => {
   // Clear all mocks before each test

@@ -1,5 +1,6 @@
 import ExpoGameCenterModule from './ExpoGameCenterModule';
 
+// Core interfaces
 export interface GameCenterPlayer {
   playerID: string;
   displayName: string;
@@ -18,4 +19,27 @@ export interface GameCenterModule {
   presentGameCenterViewController(): Promise<void>;
 }
 
+// Export service layer and connection manager
+export { 
+  GameCenterService,
+  type GameCenterConfig,
+  type ScoreSubmissionResult,
+  type AchievementResult 
+} from './GameCenterService';
+
+export { 
+  GameCenterConnectionManager,
+  type ConnectionState,
+  type ConnectionStatus,
+  type StateChangeListener 
+} from './GameCenterConnectionManager';
+
+// Export React hooks
+export { 
+  useGameCenter,
+  type UseGameCenterOptions,
+  type UseGameCenterReturn 
+} from './hooks';
+
+// Default export - the raw native module
 export default ExpoGameCenterModule as GameCenterModule;

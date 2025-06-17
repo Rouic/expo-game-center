@@ -1,0 +1,6 @@
+{
+  "name": "@rouic/expo-game-center",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
+}

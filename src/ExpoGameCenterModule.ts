@@ -1,6 +1,5 @@
-import { NativeModule } from 'expo';
-
-declare class ExpoGameCenterModule extends NativeModule {
+// Type definitions for the native module
+interface ExpoGameCenterModule {
   isGameCenterAvailable(): Promise<boolean>;
   authenticateLocalPlayer(): Promise<boolean>;
   getConstants(): { isGameCenterAvailable: boolean };

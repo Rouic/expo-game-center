@@ -5,13 +5,13 @@ package = JSON.parse(File.read(File.join(__dir__, '..', 'package.json')))
 Pod::Spec.new do |s|
   s.name           = 'ExpoGameCenter'
   s.version        = package['version']
-  s.summary        = 'Custom Expo module for Game Center integration'
-  s.description    = 'A custom Expo module that provides native iOS GameKit integration for React Native apps built with Expo'
+  s.summary        = package['description']
+  s.description    = 'A comprehensive Expo module for iOS Game Center integration, providing authentication, leaderboards, achievements, and native UI presentation.'
   s.license        = package['license']
   s.author         = package['author']
-  s.homepage       = 'https://github.com/expo/expo'
-  s.platforms      = { :ios => '13.0', :tvos => '13.0' }
-  s.source         = { git: 'https://github.com/expo/expo.git', tag: s.version.to_s }
+  s.homepage       = package['homepage']
+  s.platforms      = { :ios => '13.0' }
+  s.source         = { git: package['repository']['url'], tag: "v#{s.version}" }
   s.static_framework = true
 
   s.dependency 'ExpoModulesCore'

@@ -61,7 +61,84 @@ If you prefer manual configuration or need custom settings, add the Game Center 
 
 ## Usage
 
-### Basic Setup
+### Quick Start with React Hook (Recommended)
+
+```typescript
+import React from 'react';
+import { View, Text, Button } from 'react-native';
+import { useGameCenter } from 'expo-game-center';
+
+export function GameScreen() {
+  const {
+    isReady,
+    isLoading,
+    player,
+    authenticate,
+    submitScore,
+    showLeaderboard,
+  } = useGameCenter({
+    leaderboards: {
+      'high_scores': 'your_leaderboard_id',
+    },
+    achievements: {
+      'first_win': 'your_achievement_id',
+    },
+    autoInitialize: true,
+  });
+
+  if (isLoading) {
+    return <Text>Loading GameCenter...</Text>;
+  }
+
+  return (
+    <View>
+      {isReady ? (
+        <View>
+          <Text>Welcome, {player?.displayName}!</Text>
+          <Button 
+            title="Submit Score" 
+            onPress={() => submitScore(1000, 'high_scores')} 
+          />
+          <Button 
+            title="Show Leaderboard" 
+            onPress={() => showLeaderboard('high_scores')} 
+          />
+        </View>
+      ) : (
+        <Button title="Sign in to GameCenter" onPress={authenticate} />
+      )}
+    </View>
+  );
+}
+```
+
+### Service Layer Approach
+
+```typescript
+import { GameCenterService } from 'expo-game-center';
+
+const gameCenterService = new GameCenterService({
+  leaderboards: {
+    'high_scores': 'your_leaderboard_id',
+    'weekly_scores': 'your_weekly_leaderboard_id',
+  },
+  achievements: {
+    'first_win': 'your_first_win_achievement_id',
+    'high_scorer': 'your_high_scorer_achievement_id',
+  },
+  enableLogging: true,
+});
+
+// Initialize and authenticate
+await gameCenterService.initialize();
+const authenticated = await gameCenterService.authenticate();
+
+// Submit score and report achievement
+await gameCenterService.submitScore(9999, 'high_scores');
+await gameCenterService.reportAchievement('first_win', 100);
+```
+
+### Basic Native Module Usage
 
 ```typescript
 import ExpoGameCenter from 'expo-game-center';

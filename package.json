@@ -15,7 +15,12 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --coverage --watchAll=false",
-    "prepublishOnly": "npm run clean && npm run build && npm run test:ci"
+    "prepublishOnly": "npm run clean && npm run build && npm run test:ci",
+    "release": "node scripts/release.js",
+    "release:patch": "npm version patch && npm run release:publish",
+    "release:minor": "npm version minor && npm run release:publish", 
+    "release:major": "npm version major && npm run release:publish",
+    "release:publish": "git push origin main && git push origin --tags"
   },
   "keywords": [
     "expo",
@@ -54,6 +59,8 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.0",
+    "@types/react": "^18.0.0",
+    "@types/react-native": "^0.73.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.0.0",
@@ -62,7 +69,9 @@
     "typescript": "^5.0.0"
   },
   "peerDependencies": {
-    "expo": ">=49.0.0"
+    "expo": ">=49.0.0",
+    "react": "*",
+    "react-native": "*"
   },
   "engines": {
     "node": ">=16.0.0"
