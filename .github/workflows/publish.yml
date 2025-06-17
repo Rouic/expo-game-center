@@ -74,7 +74,7 @@ jobs:
 
       - name: Publish to NPM
         if: steps.version-check.outputs.version-changed == 'true' && (github.event_name != 'workflow_dispatch' || inputs.publish_npm == true)
-        run: npm publish --provenance
+        run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -96,7 +96,7 @@ jobs:
 
       - name: Publish to GitHub Packages
         if: steps.version-check.outputs.version-changed == 'true' && (github.event_name != 'workflow_dispatch' || inputs.publish_github == true)
-        run: npm publish --provenance
+        run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
