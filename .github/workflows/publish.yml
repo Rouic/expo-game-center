@@ -3,13 +3,11 @@ name: Publish Package
 on:
   push:
     branches: [main]
+    tags: ['v*']
     paths-ignore:
       - 'README.md'
       - 'docs/**'
       - '.github/**'
-  push:
-    tags:
-      - 'v*' # Trigger on version tags
   workflow_dispatch: # Allow manual trigger
     inputs:
       publish_npm:
