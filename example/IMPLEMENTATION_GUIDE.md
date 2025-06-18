@@ -281,5 +281,3 @@ const requestGameCenterPermission = async () => {
   );
 };
 ```
-
-This implementation guide should help developers quickly integrate Game Center into their apps!
