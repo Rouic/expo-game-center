@@ -69,8 +69,12 @@ public class ExpoGameCenterModule: Module {
 
         // Handle error case
         if let error = error {
-          print("[ExpoGameCenter] ❌ Authentication error: \(error.localizedDescription)")
-          promise.reject("AUTHENTICATION_ERROR", error.localizedDescription)
+          print("[ExpoGameCenter] ⚠️ GameKit authentication error: \(error.localizedDescription)")
+          // Error means user declined GameCenter or it's restricted
+          // This is NOT a fatal error - just return false (not authenticated)
+          let isAuthenticated = GKLocalPlayer.local.isAuthenticated
+          print("[ExpoGameCenter] Player authenticated status: \(isAuthenticated)")
+          promise.resolve(isAuthenticated)
           return
         }
 
