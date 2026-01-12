@@ -3,11 +3,27 @@ import GameKit
 import Foundation
 import UIKit
 
+// Delegate class to handle GameCenter view controller dismissal
+class GameCenterDelegate: NSObject, GKGameCenterControllerDelegate {
+  var onDismiss: (() -> Void)?
+
+  func gameCenterViewControllerDidFinish(_ gameCenterViewController: GKGameCenterViewController) {
+    print("[ExpoGameCenter] User dismissed GameCenter view controller")
+    gameCenterViewController.dismiss(animated: true) {
+      print("[ExpoGameCenter] GameCenter view controller dismissed")
+      self.onDismiss?()
+    }
+  }
+}
+
 public class ExpoGameCenterModule: Module {
   // Promise storage for async UI operations
   private var leaderboardPromise: Promise?
   private var achievementsPromise: Promise?
   private var gameCenterPromise: Promise?
+
+  // Delegate instance
+  private let gameCenterDelegate = GameCenterDelegate()
 
   // Required for module registration
   public required init(appContext: AppContext) {
@@ -196,13 +212,23 @@ public class ExpoGameCenterModule: Module {
         // Store promise to resolve when user dismisses the leaderboard
         self.leaderboardPromise = promise
 
+        // Set up delegate callback to resolve promise when dismissed
+        self.gameCenterDelegate.onDismiss = { [weak self] in
+          guard let self = self else { return }
+          if let promise = self.leaderboardPromise {
+            self.leaderboardPromise = nil
+            print("[ExpoGameCenter] ✅ Resolving leaderboard promise")
+            promise.resolve(nil)
+          }
+        }
+
         if #available(iOS 14.0, *) {
           let leaderboardVC = GKGameCenterViewController(
             leaderboardID: leaderboardID,
             playerScope: .global,
             timeScope: .allTime
           )
-          leaderboardVC.gameCenterDelegate = self
+          leaderboardVC.gameCenterDelegate = self.gameCenterDelegate
 
           print("[ExpoGameCenter] 📊 Presenting leaderboard...")
           rootViewController.present(leaderboardVC, animated: true) {
@@ -213,7 +239,7 @@ public class ExpoGameCenterModule: Module {
         } else {
           // Fallback for iOS 13
           let leaderboardVC = GKGameCenterViewController()
-          leaderboardVC.gameCenterDelegate = self
+          leaderboardVC.gameCenterDelegate = self.gameCenterDelegate
           leaderboardVC.viewState = .leaderboards
           leaderboardVC.leaderboardIdentifier = leaderboardID
 
@@ -239,16 +265,25 @@ public class ExpoGameCenterModule: Module {
 
         self.achievementsPromise = promise
 
+        // Set up delegate callback to resolve promise when dismissed
+        self.gameCenterDelegate.onDismiss = { [weak self] in
+          guard let self = self else { return }
+          if let promise = self.achievementsPromise {
+            self.achievementsPromise = nil
+            promise.resolve(nil)
+          }
+        }
+
         if #available(iOS 14.0, *) {
           let achievementVC = GKGameCenterViewController(state: .achievements)
-          achievementVC.gameCenterDelegate = self
+          achievementVC.gameCenterDelegate = self.gameCenterDelegate
 
           rootViewController.present(achievementVC, animated: true) {
             self.scheduleAchievementsTimeout()
           }
         } else {
           let achievementVC = GKGameCenterViewController()
-          achievementVC.gameCenterDelegate = self
+          achievementVC.gameCenterDelegate = self.gameCenterDelegate
           achievementVC.viewState = .achievements
 
           rootViewController.present(achievementVC, animated: true) {
@@ -272,16 +307,25 @@ public class ExpoGameCenterModule: Module {
 
         self.gameCenterPromise = promise
 
+        // Set up delegate callback to resolve promise when dismissed
+        self.gameCenterDelegate.onDismiss = { [weak self] in
+          guard let self = self else { return }
+          if let promise = self.gameCenterPromise {
+            self.gameCenterPromise = nil
+            promise.resolve(nil)
+          }
+        }
+
         if #available(iOS 14.0, *) {
           let gameCenterVC = GKGameCenterViewController(state: .default)
-          gameCenterVC.gameCenterDelegate = self
+          gameCenterVC.gameCenterDelegate = self.gameCenterDelegate
 
           rootViewController.present(gameCenterVC, animated: true) {
             self.scheduleGameCenterTimeout()
           }
         } else {
           let gameCenterVC = GKGameCenterViewController()
-          gameCenterVC.gameCenterDelegate = self
+          gameCenterVC.gameCenterDelegate = self.gameCenterDelegate
           gameCenterVC.viewState = .default
 
           rootViewController.present(gameCenterVC, animated: true) {
@@ -366,33 +410,5 @@ public class ExpoGameCenterModule: Module {
 
     // Last resort fallback
     return UIApplication.shared.windows.first?.rootViewController
-  }
-}
-
-// MARK: - GKGameCenterControllerDelegate
-
-extension ExpoGameCenterModule: GKGameCenterControllerDelegate {
-  /// Called when user dismisses a GameCenter view controller
-  public func gameCenterViewControllerDidFinish(_ gameCenterViewController: GKGameCenterViewController) {
-    print("[ExpoGameCenter] User dismissed GameCenter view controller")
-
-    gameCenterViewController.dismiss(animated: true) {
-      print("[ExpoGameCenter] GameCenter view controller dismissed")
-
-      // Resolve the appropriate promise based on which view was shown
-      if let promise = self.leaderboardPromise {
-        self.leaderboardPromise = nil
-        print("[ExpoGameCenter] ✅ Resolving leaderboard promise")
-        promise.resolve(nil)
-      } else if let promise = self.achievementsPromise {
-        self.achievementsPromise = nil
-        promise.resolve(nil)
-      } else if let promise = self.gameCenterPromise {
-        self.gameCenterPromise = nil
-        promise.resolve(nil)
-      } else {
-        print("[ExpoGameCenter] ⚠️ No promise to resolve (unexpected)")
-      }
-    }
   }
 }
