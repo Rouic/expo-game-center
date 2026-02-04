@@ -1,12 +1,13 @@
 {
   "name": "expo-game-center",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A comprehensive Expo module for iOS Game Center integration, providing authentication, leaderboards, achievements, and native UI presentation.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
     "build": "tsc && npm run build:plugin",
     "build:plugin": "cd plugin && tsc",
+    "prepare": "npm run build",
     "clean": "rm -rf build && rm -rf plugin/build",
     "lint": "eslint src/ --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint src/ --ext .ts,.tsx,.js,.jsx --fix",
@@ -48,11 +49,13 @@
   "license": "MIT",
   "files": [
     "build",
+    "src",
     "ios",
     "plugin",
     "expo-module.config.json",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "tsconfig.json"
   ],
   "dependencies": {
     "@expo/config-plugins": "^7.0.0"

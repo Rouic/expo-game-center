@@ -5,7 +5,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # Build outputs
-build/
+# Don't ignore build/ - we commit it for GitHub installs
+# build/
 dist/
 *.tgz
 

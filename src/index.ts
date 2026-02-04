@@ -41,5 +41,31 @@ export {
   type UseGameCenterReturn 
 } from './hooks';
 
-// Default export - the raw native module
-export default ExpoGameCenterModule as GameCenterModule;
+// Wrap the native module to add build version marker
+const WrappedGameCenterModule: GameCenterModule = {
+  isGameCenterAvailable: () => ExpoGameCenterModule!.isGameCenterAvailable(),
+
+  authenticateLocalPlayer: async () => {
+    console.log('[ExpoGameCenter] Calling native authenticateLocalPlayer...');
+
+    try {
+      const result = await ExpoGameCenterModule!.authenticateLocalPlayer();
+      console.log('[ExpoGameCenter] ✅ Authentication result:', result);
+      return result;
+    } catch (error: any) {
+      console.log('[ExpoGameCenter] ❌ Authentication error:', error?.message || error);
+      throw error;
+    }
+  },
+
+  getLocalPlayer: () => ExpoGameCenterModule!.getLocalPlayer(),
+  getPlayerImage: () => ExpoGameCenterModule!.getPlayerImage(),
+  submitScore: (score: number, leaderboardID: string) => ExpoGameCenterModule!.submitScore(score, leaderboardID),
+  reportAchievement: (achievementID: string, percentComplete: number) => ExpoGameCenterModule!.reportAchievement(achievementID, percentComplete),
+  presentLeaderboard: (leaderboardID: string) => ExpoGameCenterModule!.presentLeaderboard(leaderboardID),
+  presentAchievements: () => ExpoGameCenterModule!.presentAchievements(),
+  presentGameCenterViewController: () => ExpoGameCenterModule!.presentGameCenterViewController(),
+};
+
+// Default export - wrapped module with build markers
+export default WrappedGameCenterModule;
