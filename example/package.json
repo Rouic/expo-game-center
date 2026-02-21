@@ -11,10 +11,10 @@
     "eject": "expo eject"
   },
   "dependencies": {
-    "expo": "~50.0.0",
+    "expo": "~54.0.33",
     "expo-status-bar": "~1.11.1",
     "react": "18.2.0",
-    "react-native": "0.73.6",
+    "react-native": "0.84.0",
     "expo-game-center": "file:.."
   },
   "devDependencies": {
